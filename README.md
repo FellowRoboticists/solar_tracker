@@ -11,6 +11,10 @@ sensors.
 The effect is that of a pointer that is always directed at the brightest source of light in
 the vicinity.
 
+The original inspiration for putting this thing together was an Arduino Instructable at 
+http://www.instructables.com/id/Arduino-Solar-Tracker. This site has the schematic and 
+thoughts on how to build the tracker. 
+
 Copyright
 =========
 
