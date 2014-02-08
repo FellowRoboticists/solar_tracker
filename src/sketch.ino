@@ -40,6 +40,8 @@ void setup() {
   // Set up the Servo connections 
   horizontal.attach(horizontalServoPin);
   vertical.attach(verticalServoPin);
+
+  Serial.println("Ready");
 }
 
 int determineNextValue(int currentValue, int diffValue) {
@@ -70,6 +72,7 @@ void loop() {
   Serial.print("vRT = "); Serial.println(vRT);
   Serial.print("vLD = "); Serial.println(vLD);
   Serial.print("vRD = "); Serial.println(vRD);
+  Serial.println("");
   
   // Calculate the average values for the four "sides"
   int avgTop = (vLT + vRT) / 2;
@@ -80,11 +83,11 @@ void loop() {
   
   // Determine the difference between the averages
   int diffVertical = avgDown - avgTop;
-  // int diffVertical = avgTop - avgDown;
   int diffHorizontal = avgLeft - avgRight;
   
   Serial.print("diffVertical = "); Serial.println(diffVertical);
   Serial.print("diffHorizontal = "); Serial.println(diffHorizontal);
+  Serial.println("");
   
   if (abs(diffVertical) > tolerance) {
     // The difference is greater than the tolerance. We can
@@ -101,6 +104,7 @@ void loop() {
   }
   Serial.print("verticalValue = "); Serial.println(verticalValue);
   Serial.print("horizontalValue = "); Serial.println(horizontalValue);
+  Serial.println("");
   
   delay(delayTime);
 }
