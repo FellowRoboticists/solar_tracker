@@ -1,110 +1,59 @@
 // -*- c -*-
 // solar_tracker Arduino sketch
 //
-// Copyright (c) 2013 Dave Sieh
+// Copyright (c) 2013,2014 Dave Sieh
 //
 // See LICENSE.txt for details.
 
-
 #include <Servo.h> // Include the Servo Library
-
-// Create the Servo objects. These guys control the
-// actual physical servos. The values for the servos
-// will start at 90 and range between 0 and 180
-
-Servo vertical;
-int verticalValue = 90; // Initial value of 90
-
-Servo horizontal;
-int horizontalValue = 90; // Initial value of 90
+#include "dual_servo.h"
+#include "light_direction_sensor.h"
 
 // Set up the initial pin connections for the LDRs
 // name = analogpin
-int ldrLT = 0; // LDR top left
-int ldrRT = 1; // LDR top right (I think this should be left down)
-int ldrLD = 2; // LDR down left (I think this should be right top)
-int ldrRD = 3; // LDR down right
+#define LDR_LEFT_TOP 0
+#define LDR_RIGHT_TOP 1
+#define LDR_LEFT_BOTTOM 2
+#define LDR_RIGHT_BOTTOM 3
+
+#define DELAY_TIME 100
 
 // Set up the digital pin assignments
-int horizontalServoPin = 9;
-int verticalServoPin = 10;
+#define HORIZONTAL_SERVO_PIN 9
+#define VERTICAL_SERVO_PIN 10
 
-// Set up some values for the delay time and tolerance;
-// Change these values to suit your taste
-int delayTime = 100;
-int tolerance = 20;
+#define LIGHT_TOLERANCE 20
+
+DualServo servos(HORIZONTAL_SERVO_PIN, 
+                 VERTICAL_SERVO_PIN);
+
+LightDirectionSensor lds(LDR_LEFT_TOP, 
+                         LDR_RIGHT_TOP, 
+                         LDR_LEFT_BOTTOM, 
+                         LDR_RIGHT_BOTTOM);
 
 void setup() {
   Serial.begin(9600);
   
   // Set up the Servo connections 
-  horizontal.attach(horizontalServoPin);
-  vertical.attach(verticalServoPin);
+  servos.begin();
+
+  // Set up the light direction sensor
+  lds.tolerance(LIGHT_TOLERANCE);
+  lds.begin();
 
   Serial.println("Ready");
 }
 
-int determineNextValue(int currentValue, int diffValue) {
-  if (diffValue > 0) {
-    currentValue++;
-  } else {
-    currentValue--;
-  }
-  
-  // Clamp the value between 0 and 180
-  if (currentValue > 180) {
-    currentValue = 180;
-  } else if (currentValue < 0) {
-    currentValue = 0;
-  }
-  
-  return currentValue;
-}
-
 void loop() {
-  // Read the current values of the LDRs
-  int vLT = analogRead(ldrLT); // Top Left
-  int vRT = analogRead(ldrRT); // Top Right
-  int vLD = analogRead(ldrLD); // Down Left
-  int vRD = analogRead(ldrRD); // Down Right
-  
-  Serial.print("vLT = "); Serial.println(vLT);
-  Serial.print("vRT = "); Serial.println(vRT);
-  Serial.print("vLD = "); Serial.println(vLD);
-  Serial.print("vRD = "); Serial.println(vRD);
-  Serial.println("");
-  
-  // Calculate the average values for the four "sides"
-  int avgTop = (vLT + vRT) / 2;
-  int avgDown = (vLD + vRD) / 2;
-  int avgLeft = (vLT + vLD) / 2;
-  int avgRight = (vRT + vRD) / 2;
-  
-  
-  // Determine the difference between the averages
-  int diffVertical = avgDown - avgTop;
-  int diffHorizontal = avgLeft - avgRight;
-  
-  Serial.print("diffVertical = "); Serial.println(diffVertical);
-  Serial.print("diffHorizontal = "); Serial.println(diffHorizontal);
-  Serial.println("");
-  
-  if (abs(diffVertical) > tolerance) {
-    // The difference is greater than the tolerance. We can
-    // go ahead and move the vertical servo
-    verticalValue = determineNextValue(verticalValue, diffVertical);
-    vertical.write(verticalValue);
-  }
-  
-  if (abs(diffHorizontal) > tolerance) {
-    // The difference is greater than the tolerance. We can
-    // go ahead and move the horizontal servo
-    horizontalValue = determineNextValue(horizontalValue, diffHorizontal);
-    horizontal.write(horizontalValue);
-  }
-  Serial.print("verticalValue = "); Serial.println(verticalValue);
-  Serial.print("horizontalValue = "); Serial.println(horizontalValue);
-  Serial.println("");
-  
-  delay(delayTime);
+  // Have the light detection sensor check out
+  // what's going on.
+  lds.readValues();
+
+  int hdot = lds.horizontalDifferenceOutsideTolerance();
+  int vdot = lds.verticalDifferenceOutsideTolerance();
+
+  servos.bumpServoLocations(hdot, vdot);
+
+  delay(DELAY_TIME);
 }
