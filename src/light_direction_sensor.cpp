@@ -68,6 +68,11 @@ int LightDirectionSensor::verticalDifferenceOutsideTolerance() {
   return (abs(diffVert) > _tolerance) ? diffVert : 0;
 }
 
+void LightDirectionSensor::differenceOutsideTolerance(int &hdot, int &vdot) {
+  hdot = horizontalDifferenceOutsideTolerance();
+  vdot = verticalDifferenceOutsideTolerance();
+}
+
 void LightDirectionSensor::readValues() {
   // Read the current values of the LDRs
   _vLT = analogRead(_leftTopPin);

@@ -19,8 +19,13 @@
 #define DELAY_TIME 200
 
 // Set up the digital pin assignments
-#define HORIZONTAL_SERVO_PIN 9
-#define VERTICAL_SERVO_PIN 10
+// We're going with pins 6 and 7 because we eventually want
+// to incorporate the BLE shield and it eats up pins 9 and 10
+// which are the pins most often referenced in servo sketches.
+// The fact of the matter is that it works fine on just about
+// any other digital pins.
+#define HORIZONTAL_SERVO_PIN 6
+#define VERTICAL_SERVO_PIN 7
 
 #define LIGHT_TOLERANCE 20
 
@@ -50,8 +55,16 @@ void loop() {
   // what's going on.
   lds.readValues();
 
-  int hdot = lds.horizontalDifferenceOutsideTolerance();
-  int vdot = lds.verticalDifferenceOutsideTolerance();
+  // So here's the deal with hdot and vdot. The absolute value of the
+  // variables is not important. Only the sign is of significance:
+  //
+  // *dot < 0 - means the servo must move left/down
+  // *dot = 0 - means the servo can stay where it is
+  // *dot > 0 - means the servo must move right/up
+  //
+  int hdot = 0;
+  int vdot = 0;
+  lds.differenceOutsideTolerance(hdot, vdot);
 
   Serial.println("---------------------------------------------------");
   Serial.print("HDOT: "); Serial.println(hdot);

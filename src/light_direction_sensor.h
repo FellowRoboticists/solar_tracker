@@ -39,6 +39,7 @@ class LightDirectionSensor {
     // returns 0
     int horizontalDifferenceOutsideTolerance();
     int verticalDifferenceOutsideTolerance();
+    void differenceOutsideTolerance(int &hdot, int &vdot);
 
   private:
 
