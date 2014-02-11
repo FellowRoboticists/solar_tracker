@@ -16,7 +16,7 @@
 #define LDR_LEFT_BOTTOM 2
 #define LDR_RIGHT_BOTTOM 3
 
-#define DELAY_TIME 100
+#define DELAY_TIME 200
 
 // Set up the digital pin assignments
 #define HORIZONTAL_SERVO_PIN 9
@@ -52,6 +52,10 @@ void loop() {
 
   int hdot = lds.horizontalDifferenceOutsideTolerance();
   int vdot = lds.verticalDifferenceOutsideTolerance();
+
+  Serial.println("---------------------------------------------------");
+  Serial.print("HDOT: "); Serial.println(hdot);
+  Serial.print("VDOT: "); Serial.println(vdot);
 
   servos.bumpServoLocations(hdot, vdot);
 

@@ -70,14 +70,14 @@ int LightDirectionSensor::verticalDifferenceOutsideTolerance() {
 
 void LightDirectionSensor::readValues() {
   // Read the current values of the LDRs
-  int vLT = analogRead(_leftTopPin);
-  int vRT = analogRead(_rightTopPin);
-  int vLB = analogRead(_leftBottomPin);
-  int vRB = analogRead(_rightBottomPin);
+  _vLT = analogRead(_leftTopPin);
+  _vRT = analogRead(_rightTopPin);
+  _vLB = analogRead(_leftBottomPin);
+  _vRB = analogRead(_rightBottomPin);
   
-  Serial.print("vLT = "); Serial.println(vLT);
-  Serial.print("vRT = "); Serial.println(vRT);
-  Serial.print("vLB = "); Serial.println(vLB);
-  Serial.print("vRB = "); Serial.println(vRB);
+  Serial.print("vLT = "); Serial.println(_vLT);
+  Serial.print("vRT = "); Serial.println(_vRT);
+  Serial.print("vLB = "); Serial.println(_vLB);
+  Serial.print("vRB = "); Serial.println(_vRB);
   Serial.println("");
 }
