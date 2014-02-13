@@ -6,8 +6,10 @@
 // See LICENSE.txt for details.
 
 #include <Servo.h> // Include the Servo Library
+#include <ble_shield.h>
 #include "dual_servo.h"
 #include "light_direction_sensor.h"
+#include "ble_controller.h"
 
 // Set up the initial pin connections for the LDRs
 // name = analogpin
@@ -30,16 +32,31 @@
 #define LIGHT_TOLERANCE 20
 
 DualServo servos(HORIZONTAL_SERVO_PIN, 
-                 VERTICAL_SERVO_PIN);
+    VERTICAL_SERVO_PIN);
 
 LightDirectionSensor lds(LDR_LEFT_TOP, 
-                         LDR_RIGHT_TOP, 
-                         LDR_LEFT_BOTTOM, 
-                         LDR_RIGHT_BOTTOM);
+    LDR_RIGHT_TOP, 
+    LDR_LEFT_BOTTOM, 
+    LDR_RIGHT_BOTTOM);
+BLEController controller;
+
+// This is a toggle that enables/disables use
+// of the light sensor to control the positioning
+// of the servos. Defaults to 'true'.
+boolean lightSensing = true;
 
 void setup() {
   Serial.begin(9600);
-  
+
+  // Initialize and start the BLE library
+  // controller_begin();
+  controller.begin();
+
+  // Register the commands to be processed from
+  // the bluetooth device
+  controller.addCommand(0, &toggleLightDirectionSensing);
+  controller.addCommand(1, &positionServos);
+
   // Set up the Servo connections 
   servos.begin();
 
@@ -51,12 +68,31 @@ void setup() {
 }
 
 void loop() {
+
+  if (lightSensing) {
+    processLightSensor();
+  }
+
+  controller.processIncomingData();
+
+  if (!controller.connected()) {
+    //analog_enacontrollerd = false;
+    //digitalWrite(DIGITAL_OUT_PIN, LOW);
+  }
+
+  // Allow BLE Shield to send/receive data
+  controller.processEvents();  
+
+  delay(DELAY_TIME);
+}
+
+void processLightSensor() {
   // Have the light detection sensor check out
   // what's going on.
   lds.readValues();
 
   // So here's the deal with hdot and vdot. The absolute value of the
-  // variables is not important. Only the sign is of significance:
+  // variacontrollers is not important. Only the sign is of significance:
   //
   // *dot < 0 - means the servo must move left/down
   // *dot = 0 - means the servo can stay where it is
@@ -66,11 +102,26 @@ void loop() {
   int vdot = 0;
   lds.differenceOutsideTolerance(hdot, vdot);
 
-  Serial.println("---------------------------------------------------");
-  Serial.print("HDOT: "); Serial.println(hdot);
-  Serial.print("VDOT: "); Serial.println(vdot);
+  //Serial.println("---------------------------------------------------");
+  //Serial.print("HDOT: "); Serial.println(hdot);
+  //Serial.print("VDOT: "); Serial.println(vdot);
 
   servos.bumpServoLocations(hdot, vdot);
+}
 
-  delay(DELAY_TIME);
+//
+// The following are commands supported by the
+// BLE Shield.
+//
+
+void toggleLightDirectionSensing(byte byte1, byte byte2) {
+  Serial.println("TLDS");
+  lightSensing = byte1 == 0x01;
+}
+
+void positionServos(byte byte1, byte byte2) {
+  if (lightSensing) return;
+  Serial.println("PS");
+  servos.horizontalValue(byte1);
+  servos.verticalValue(byte2);
 }
