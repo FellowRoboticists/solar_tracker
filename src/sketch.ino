@@ -69,21 +69,23 @@ void setup() {
 
 void loop() {
 
-  if (lightSensing) {
-    processLightSensor();
-  }
-
+  if (lightSensing) processLightSensor();
+  
+  // Be aware that what this method does is to read any available
+  // data from the BLE shield and invokes the commands registered
+  // in the setup method.
   controller.processIncomingData();
 
+  // Anything that only makes sense to do when the BLE Shield isn't
+  // connected should be done here.
   if (!controller.connected()) {
-    //analog_enacontrollerd = false;
-    //digitalWrite(DIGITAL_OUT_PIN, LOW);
+    lightSensing = true;
   }
 
   // Allow BLE Shield to send/receive data
   controller.processEvents();  
 
-  delay(DELAY_TIME);
+  if (lightSensing) delay(DELAY_TIME);
 }
 
 void processLightSensor() {
@@ -101,10 +103,6 @@ void processLightSensor() {
   int hdot = 0;
   int vdot = 0;
   lds.differenceOutsideTolerance(hdot, vdot);
-
-  //Serial.println("---------------------------------------------------");
-  //Serial.print("HDOT: "); Serial.println(hdot);
-  //Serial.print("VDOT: "); Serial.println(vdot);
 
   servos.bumpServoLocations(hdot, vdot);
 }

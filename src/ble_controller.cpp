@@ -1,3 +1,9 @@
+// solar_tracker Arduino sketch
+//
+// Copyright (c) 2013,2014 Dave Sieh
+//
+// See LICENSE.txt for details.
+
 #include <ble_shield.h>
 #include "ble_controller.h"
 
