@@ -7,17 +7,36 @@
 #ifndef _LIGHT_DIRECTION_SENSOR_H_
 #define _LIGHT_DIRECTION_SENSOR_H_
 
+// Function prototype for a callback that receives updates
+// to the current readings of the LDR's.
 typedef void (*reportSensorValuePtr)(int leftTop, int leftBottom, int rightTop, int rightBottom);
 
+/**
+ * Responsible for managing the light direction sensor and the
+ * associated LDR's.
+ */
 class LightDirectionSensor {
   public:
 
+    /**
+     * Constructs a new LightDirectionSensor object.
+     *
+     * leftTopPin     pin for the left top LDR
+     * rightTopPin    pin for the right top LDR
+     * leftBottomPin  pin for the left bottom LDR
+     * rightBottomPin pin for the right bottom LDR
+     * rptSV          the callback for reporting LDR values.
+     */
     LightDirectionSensor(int leftTopPin, 
                          int rightTopPin, 
                          int leftBottomPin, 
                          int rightBottomPin,
                          reportSensorValuePtr rptSV);
 
+    /**
+     * Prepares the LightDirectionSensor for use. Typically
+     * called in the sketch's setup method.
+     */
     void begin();
 
     // Get/set the tolerance value for light sensing

@@ -36,7 +36,7 @@ void BLEController::processIncomingData() {
   }
 }
 
-int BLEController::connected() {
+boolean BLEController::connected() {
   ble_connected();
 }
 
