@@ -26,6 +26,10 @@ class BLEController {
 
     void processEvents();
 
+    void sendCommand(byte command, byte byte1, byte byte2);
+
+    void sendCommand(byte command, uint16_t intValue);
+
   private:
     commandPtr _commands[MAX_COMMANDS];
 };

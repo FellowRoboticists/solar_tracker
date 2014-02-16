@@ -7,13 +7,16 @@
 #ifndef _LIGHT_DIRECTION_SENSOR_H_
 #define _LIGHT_DIRECTION_SENSOR_H_
 
+typedef void (*reportSensorValuePtr)(int leftTop, int leftBottom, int rightTop, int rightBottom);
+
 class LightDirectionSensor {
   public:
 
     LightDirectionSensor(int leftTopPin, 
                          int rightTopPin, 
                          int leftBottomPin, 
-                         int rightBottomPin);
+                         int rightBottomPin,
+                         reportSensorValuePtr rptSV);
 
     void begin();
 
@@ -57,6 +60,9 @@ class LightDirectionSensor {
     int _vRT;
     int _vLB;
     int _vRB;
+
+    // The function pointer to report sensor values
+    reportSensorValuePtr _rptSensorValue;
 
 };
 

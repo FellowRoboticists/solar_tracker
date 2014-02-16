@@ -18,12 +18,14 @@
 
 DualServo::DualServo(
     int horizontalPin, 
-    int verticalPin) {
+    int verticalPin, 
+    reportServoValuesPtr rptSV) {
 
   this->_horizontalPin = horizontalPin;
   this->_verticalPin = verticalPin;
   this->_horizontalValue = DEFAULT_HORIZONTAL_VALUE;
   this->_verticalValue = DEFAULT_VERTICAL_VALUE;
+  this->_reportServoValues = rptSV;
 }
 
 void DualServo::begin() {
@@ -70,6 +72,10 @@ void DualServo::bumpServoLocations(
 
   bumpHorizontalValue(horzBumpFlag);
   bumpVerticalValue(vertBumpFlag);
+  
+  if (_reportServoValues) {
+    _reportServoValues(_horizontalValue, _verticalValue);
+  }
 }
 
 int DualServo::clampValue(int value) {

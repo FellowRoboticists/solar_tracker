@@ -44,3 +44,14 @@ void BLEController::processEvents() {
   // Allow BLE Shield to send/receive data
   ble_do_events();  
 }
+void BLEController::sendCommand(byte command, byte byte1, byte byte2) {
+  ble_write(command);
+  ble_write(byte1);
+  ble_write(byte2);
+}
+
+void BLEController::sendCommand(byte command, uint16_t intValue) {
+  ble_write(command);
+  ble_write(intValue >> 8);
+  ble_write(intValue);
+}

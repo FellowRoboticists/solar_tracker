@@ -8,12 +8,14 @@
 #ifndef _DUAL_SERVO_H_
 #define _DUAL_SERVO_H_
 
+typedef void (*reportServoValuesPtr)(byte horizontal, byte vertical);
+
 class Servo;
 
 class DualServo {
   public:
 
-    DualServo(int horizontalPin, int verticalPin);
+    DualServo(int horizontalPin, int verticalPin, reportServoValuesPtr rptSV);
 
     void begin();
 
@@ -47,6 +49,8 @@ class DualServo {
 
     Servo _horizontal;
     Servo _vertical;
+
+    reportServoValuesPtr _reportServoValues;
 };
 
 #endif

@@ -32,12 +32,15 @@
 #define LIGHT_TOLERANCE 20
 
 DualServo servos(HORIZONTAL_SERVO_PIN, 
-    VERTICAL_SERVO_PIN);
+    VERTICAL_SERVO_PIN,
+    &reportServoValues);
 
 LightDirectionSensor lds(LDR_LEFT_TOP, 
     LDR_RIGHT_TOP, 
     LDR_LEFT_BOTTOM, 
-    LDR_RIGHT_BOTTOM);
+    LDR_RIGHT_BOTTOM,
+    &reportLightSensorValues);
+
 BLEController controller;
 
 // This is a toggle that enables/disables use
@@ -69,7 +72,13 @@ void setup() {
 
 void loop() {
 
-  if (lightSensing) processLightSensor();
+  if (lightSensing) {
+    // Here we want the light sensors to control the servos
+    processLightSensor();
+  } else {
+    // Here we just want to read the light sensors
+    lds.readValues();
+  }
   
   // Be aware that what this method does is to read any available
   // data from the BLE shield and invokes the commands registered
@@ -122,4 +131,29 @@ void positionServos(byte byte1, byte byte2) {
   Serial.println("PS");
   servos.horizontalValue(byte1);
   servos.verticalValue(byte2);
+}
+
+//
+// The following are callbacks to send outbound data
+//
+
+void reportLightSensorValues(int leftTop, 
+                             int leftBottom, 
+                             int rightTop, 
+                             int rightBottom) {
+
+  // Get out early if we're not connected to the BLE
+  if (!controller.connected()) return;
+
+  controller.sendCommand(0x10, leftTop);
+  controller.sendCommand(0x11, leftBottom);
+  controller.sendCommand(0x12, rightTop);
+  controller.sendCommand(0x13, rightBottom);
+}
+
+void reportServoValues(byte horizontal, byte vertical) {
+  // Get out early if we're not connected to the BLE
+  if (!controller.connected()) return;
+
+  controller.sendCommand(0x20, horizontal, vertical);
 }
