@@ -10,6 +10,7 @@
 #include "dual_servo.h"
 #include "light_direction_sensor.h"
 #include "ble_controller.h"
+#include "gestures.h"
 
 // Set up the initial pin connections for the LDRs
 // name = analogpin
@@ -41,6 +42,8 @@ LightDirectionSensor lds(LDR_LEFT_TOP,
     LDR_RIGHT_BOTTOM,
     &reportLightSensorValues);
 
+Gestures gestures(&servos, 90, 30);
+
 BLEController controller;
 
 // This is a toggle that enables/disables use
@@ -59,6 +62,12 @@ void setup() {
   // the bluetooth device
   controller.addCommand(0, &toggleLightDirectionSensing);
   controller.addCommand(1, &positionServos);
+  controller.addCommand(2, &setMaxDelay);
+  controller.addCommand(3, &setFocus);
+  controller.addCommand(4, &setMultiplier);
+  controller.addCommand(5, &shakeYourHead);
+  controller.addCommand(6, &nodYourHead);
+  controller.addCommand(7, &dejectedShakeYourHead);
 
   // Set up the Servo connections 
   servos.begin();
@@ -66,6 +75,9 @@ void setup() {
   // Set up the light direction sensor
   lds.tolerance(LIGHT_TOLERANCE);
   lds.begin();
+
+  // Set up the gestures
+  gestures.begin();
 
   Serial.println("Ready");
 }
@@ -131,6 +143,33 @@ void positionServos(byte byte1, byte byte2) {
   Serial.println("PS");
   servos.horizontalValue(byte1);
   servos.verticalValue(byte2);
+}
+
+void setMaxDelay(byte byte1, byte byte2) {
+  gestures.setMaxDelay(byte2 | byte1 << 8);
+}
+
+void setFocus(byte byte1, byte byte2) {
+  gestures.setFocus(byte2 | byte1 << 8);
+}
+
+void setMultiplier(byte byte1, byte byte2) {
+  gestures.setMultiplier(byte2 | byte1 << 8);
+}
+
+void shakeYourHead(byte byte1, byte byte2) {
+  gestures.positionServos();
+  gestures.shakeYourHead();
+}
+
+void nodYourHead(byte byte1, byte byte2) {
+  gestures.positionServos();
+  gestures.nodYourHead();
+}
+
+void dejectedShakeYourHead(byte byte1, byte byte2) {
+  gestures.positionServos();
+  gestures.dejectedShakeYourHead();
 }
 
 //
