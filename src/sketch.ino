@@ -7,6 +7,7 @@
 
 #include <Servo.h> // Include the Servo Library
 #include <ble_shield.h>
+#include <pspc_support.h>
 #include "dual_servo.h"
 #include "light_direction_sensor.h"
 #include "ble_controller.h"
@@ -79,7 +80,7 @@ void setup() {
   // Set up the gestures
   gestures.begin();
 
-  Serial.println("Ready");
+  Serial.println(P("Ready"));
 }
 
 void loop() {
@@ -134,13 +135,17 @@ void processLightSensor() {
 //
 
 void toggleLightDirectionSensing(byte byte1, byte byte2) {
-  Serial.println("TLDS");
+#ifdef SKETCH_DEBUG
+  Serial.println(P("TLDS"));
+#endif
   lightSensing = byte1 == 0x01;
 }
 
 void positionServos(byte byte1, byte byte2) {
   if (lightSensing) return;
-  Serial.println("PS");
+#ifdef SKETCH_DEBUG
+  Serial.println(P("PS"));
+#endif
   servos.horizontalValue(byte1);
   servos.verticalValue(byte2);
 }

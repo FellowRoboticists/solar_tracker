@@ -5,6 +5,7 @@
 // See LICENSE.txt for details.
 
 #include <Arduino.h>
+#include <pspc_support.h>
 #include "light_direction_sensor.h"
 
 #define DEFAULT_TOLERANCE 20
@@ -84,9 +85,11 @@ void LightDirectionSensor::readValues() {
 
   if (_rptSensorValue) _rptSensorValue(_vLT, _vLB, _vRT, _vRB);
   
-  Serial.print("vLT = "); Serial.println(_vLT);
-  Serial.print("vRT = "); Serial.println(_vRT);
-  Serial.print("vLB = "); Serial.println(_vLB);
-  Serial.print("vRB = "); Serial.println(_vRB);
-  Serial.println("");
+#ifdef LDS_DEBUG
+  Serial.print(P("vLT = ")); Serial.println(_vLT);
+  Serial.print(P("vRT = ")); Serial.println(_vRT);
+  Serial.print(P("vLB = ")); Serial.println(_vLB);
+  Serial.print(P("vRB = ")); Serial.println(_vRB);
+  Serial.println(P(""));
+#endif
 }

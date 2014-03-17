@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Servo.h>
+#include <pspc_support.h>
 #include "gestures.h"
 #include "dual_servo.h"
 
@@ -33,7 +34,9 @@ void Gestures::positionServos(int horizontalPosition, int verticalPosition) {
 }
 
 void Gestures::setMaxDelay(int delay) {
-  Serial.print("Delay: "); Serial.println(delay);
+#ifdef GESTURE_DEBUG
+  Serial.print(P("Delay: ")); Serial.println(delay);
+#endif
   _maxDelay = delay;
 }
 
@@ -42,7 +45,9 @@ int Gestures::getMaxDelay() {
 }
 
 void Gestures::setFocus(int focus) {
-  // Serial.print("Focus: "); Serial.println(delay);
+#ifdef GESTURE_DEBUG
+  Serial.print(P("Focus: ")); Serial.println(delay);
+#endif
   _focus = focus;
 }
 
@@ -51,7 +56,9 @@ int Gestures::getFocus() {
 }
 
 void Gestures::setMultiplier(int multiplier) {
-  Serial.print("Multiplier: "); Serial.println(multiplier);
+#ifdef GESTURE_DEBUG
+  Serial.print(P("Multiplier: ")); Serial.println(multiplier);
+#endif
   _multiplier = multiplier;
 }
 
@@ -90,22 +97,22 @@ int Gestures::calculateDelay(int x) {
 }
 
 void Gestures::followPath(byte *path, int length) {
-#ifdef DEBUG
-  Serial.print("Length of path: "); Serial.println(length);
+#ifdef GESTURE_DEBUG
+  Serial.print(P("Length of path: ")); Serial.println(length);
 #endif
   for (int p=0; p<length; p += 2) {
     int degrees = path[p];
     byte direction = path[p + 1];
-#ifdef DEBUG
-    Serial.print("Degrees: "); Serial.println(degrees);
-    Serial.print("Direction: "); Serial.println(direction);
+#ifdef GESTURE_DEBUG
+    Serial.print(P("Degrees: ")); Serial.println(degrees);
+    Serial.print(P("Direction: ")); Serial.println(direction);
 #endif
     int halfArc = int(degrees / 2);
     for (int a=0; a < degrees; a++) {
       int x = (a < halfArc) ? a : (degrees - a);
       int delayTime = calculateDelay(x + 1);
-#ifdef DEBUG
-      Serial.print("Degree, Delay "); Serial.print(a); Serial.print(","); Serial.println(delayTime);
+#ifdef GESTURE_DEBUG
+      Serial.print(P("Degree, Delay ")); Serial.print(a); Serial.print(P(",")); Serial.println(delayTime);
 #endif
       delay(delayTime);
       switch (direction) {
